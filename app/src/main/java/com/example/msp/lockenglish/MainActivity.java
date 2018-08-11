@@ -29,6 +29,7 @@ import com.iflytek.cloud.speech.SpeechUser;
 import com.iflytek.cloud.speech.SynthesizerListener;
 
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.List;
 import java.util.Random;
 
@@ -117,6 +118,49 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         radioGroup.setOnCheckedChangeListener(this);
         setParam();
         SpeechUser.getUser().login(MainActivity.this,null,null,"appid=573a7bf0",listener);
+
+    }
+
+    protected void onStart() {
+        super.onStart();
+
+        Calendar calendar = Calendar.getInstance();
+        mMonth = String.valueOf(calendar.get(Calendar.MONTH)+1);
+        mDay = String.valueOf(calendar.get(Calendar.DAY_OF_MONTH)+1);
+        mWay = String.valueOf(calendar.get(Calendar.DAY_OF_WEEK));
+
+        if(calendar.get(Calendar.HOUR) < 10) {
+            mHours = "0"+calendar.get(Calendar.HOUR);
+        } else {
+            mHours = String.valueOf(calendar.get(Calendar.HOUR));
+        }
+
+        if(calendar.get(Calendar.MINUTE) < 10) {
+            mMinute = "0" + calendar.get(Calendar.MINUTE);
+        } else {
+            mMinute = String.valueOf(calendar.get(Calendar.MINUTE));
+        }
+
+        if("1".equals(mWay)) {
+            mWay = "天";
+        } else if("2".equals(mWay)) {
+            mWay = "一";
+        }else if("3".equals(mWay)) {
+            mWay = "二";
+        }else if("4".equals(mWay)) {
+            mWay = "三";
+        }else if("5".equals(mWay)) {
+            mWay = "四";
+        }else if("6".equals(mWay)) {
+            mWay = "五";
+        }else if("7".equals(mWay)) {
+            mWay = "六";
+        }
+
+        timeText.setText(mHours+":"+mMinute);
+        dateText.setText(mMonth+"月"+mDay+"日"+" "+"日期"+mWay);
+
+
 
     }
 
