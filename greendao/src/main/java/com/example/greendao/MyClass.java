@@ -28,7 +28,7 @@ public class MyClass {
         entity.addIdProperty().autoincrement().primaryKey();
         entity.addStringProperty("english");
         entity.addStringProperty("china");
-        Entity entity1 = schema.addEntity("CETEntity");
+        Entity entity1 = schema.addEntity("CET4Entity");
         entity1.addStringProperty("word");
         entity1.addStringProperty("english");
         entity1.addStringProperty("china");
