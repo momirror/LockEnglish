@@ -4,8 +4,7 @@ import android.app.KeyguardManager;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.database.sqlite.SQLiteDatabase;
-import android.os.Build;
-import android.support.annotation.RequiresApi;
+import android.graphics.Color;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
@@ -35,7 +34,7 @@ import java.util.Random;
 
 public class MainActivity extends AppCompatActivity implements View.OnClickListener, RadioGroup.OnCheckedChangeListener, SynthesizerListener {
 
-    private TextView timeText,dateText,wordText,endlishText;
+    private TextView timeText,dateText,wordText, englishText;
     private ImageView playVoice;
     private String mMonth,mDay,mWay,mHours,mMinute;
     private SpeechSynthesizer speechSynthesizer;
@@ -108,7 +107,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         timeText = findViewById(R.id.time_text);
         dateText = findViewById(R.id.date_text);
         wordText = findViewById(R.id.word_text);
-        endlishText = findViewById(R.id.english_text);
+        englishText = findViewById(R.id.english_text);
         playVoice = findViewById(R.id.play_voice);
         playVoice.setOnClickListener(this);
         radioGroup = findViewById(R.id.choose_group);
@@ -242,5 +241,29 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         speechSynthesizer.setParameter(SpeechConstant.VOLUME,"50");
         speechSynthesizer.setParameter(SpeechConstant.PITCH,"50");
 
+    }
+
+
+    private void btnGetText(String msg,RadioButton btn) {
+
+        if(msg.equals(datas.get(k).getChina())) {
+
+            wordText.setTextColor(Color.GREEN);
+            englishText.setTextColor(Color.GREEN);
+        }
+        else {
+
+            wordText.setTextColor(Color.RED);
+            englishText.setTextColor(Color.RED);
+            btn.setTextColor(Color.RED);
+            saveWrongData();
+
+            int wrong = sharedPreferences.getInt("wrong",0);
+            editor.putInt("wrong",wrong+1);
+            editor.putString("wrongId",","+datas.get(j).getId());
+            editor.commit();
+
+
+        }
     }
 }
