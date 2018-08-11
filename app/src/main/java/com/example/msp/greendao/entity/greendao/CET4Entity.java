@@ -6,6 +6,7 @@ package com.example.msp.greendao.entity.greendao;
  */
 public class CET4Entity {
 
+    private Long id;
     private String word;
     private String english;
     private String china;
@@ -14,11 +15,24 @@ public class CET4Entity {
     public CET4Entity() {
     }
 
-    public CET4Entity(String word, String english, String china, String sign) {
+    public CET4Entity(Long id) {
+        this.id = id;
+    }
+
+    public CET4Entity(Long id, String word, String english, String china, String sign) {
+        this.id = id;
         this.word = word;
         this.english = english;
         this.china = china;
         this.sign = sign;
+    }
+
+    public Long getId() {
+        return id;
+    }
+
+    public void setId(Long id) {
+        this.id = id;
     }
 
     public String getWord() {

@@ -14,7 +14,7 @@ import com.example.msp.greendao.entity.greendao.CET4Entity;
 /** 
  * DAO for table "CET4_ENTITY".
 */
-public class CET4EntityDao extends AbstractDao<CET4Entity, Void> {
+public class CET4EntityDao extends AbstractDao<CET4Entity, Long> {
 
     public static final String TABLENAME = "CET4_ENTITY";
 
@@ -23,10 +23,11 @@ public class CET4EntityDao extends AbstractDao<CET4Entity, Void> {
      * Can be used for QueryBuilder and for referencing column names.
     */
     public static class Properties {
-        public final static Property Word = new Property(0, String.class, "word", false, "WORD");
-        public final static Property English = new Property(1, String.class, "english", false, "ENGLISH");
-        public final static Property China = new Property(2, String.class, "china", false, "CHINA");
-        public final static Property Sign = new Property(3, String.class, "sign", false, "SIGN");
+        public final static Property Id = new Property(0, Long.class, "id", true, "_id");
+        public final static Property Word = new Property(1, String.class, "word", false, "WORD");
+        public final static Property English = new Property(2, String.class, "english", false, "ENGLISH");
+        public final static Property China = new Property(3, String.class, "china", false, "CHINA");
+        public final static Property Sign = new Property(4, String.class, "sign", false, "SIGN");
     };
 
 
@@ -42,10 +43,11 @@ public class CET4EntityDao extends AbstractDao<CET4Entity, Void> {
     public static void createTable(SQLiteDatabase db, boolean ifNotExists) {
         String constraint = ifNotExists? "IF NOT EXISTS ": "";
         db.execSQL("CREATE TABLE " + constraint + "\"CET4_ENTITY\" (" + //
-                "\"WORD\" TEXT," + // 0: word
-                "\"ENGLISH\" TEXT," + // 1: english
-                "\"CHINA\" TEXT," + // 2: china
-                "\"SIGN\" TEXT);"); // 3: sign
+                "\"_id\" INTEGER PRIMARY KEY AUTOINCREMENT ," + // 0: id
+                "\"WORD\" TEXT," + // 1: word
+                "\"ENGLISH\" TEXT," + // 2: english
+                "\"CHINA\" TEXT," + // 3: china
+                "\"SIGN\" TEXT);"); // 4: sign
     }
 
     /** Drops the underlying database table. */
@@ -59,41 +61,47 @@ public class CET4EntityDao extends AbstractDao<CET4Entity, Void> {
     protected void bindValues(SQLiteStatement stmt, CET4Entity entity) {
         stmt.clearBindings();
  
+        Long id = entity.getId();
+        if (id != null) {
+            stmt.bindLong(1, id);
+        }
+ 
         String word = entity.getWord();
         if (word != null) {
-            stmt.bindString(1, word);
+            stmt.bindString(2, word);
         }
  
         String english = entity.getEnglish();
         if (english != null) {
-            stmt.bindString(2, english);
+            stmt.bindString(3, english);
         }
  
         String china = entity.getChina();
         if (china != null) {
-            stmt.bindString(3, china);
+            stmt.bindString(4, china);
         }
  
         String sign = entity.getSign();
         if (sign != null) {
-            stmt.bindString(4, sign);
+            stmt.bindString(5, sign);
         }
     }
 
     /** @inheritdoc */
     @Override
-    public Void readKey(Cursor cursor, int offset) {
-        return null;
+    public Long readKey(Cursor cursor, int offset) {
+        return cursor.isNull(offset + 0) ? null : cursor.getLong(offset + 0);
     }    
 
     /** @inheritdoc */
     @Override
     public CET4Entity readEntity(Cursor cursor, int offset) {
         CET4Entity entity = new CET4Entity( //
-            cursor.isNull(offset + 0) ? null : cursor.getString(offset + 0), // word
-            cursor.isNull(offset + 1) ? null : cursor.getString(offset + 1), // english
-            cursor.isNull(offset + 2) ? null : cursor.getString(offset + 2), // china
-            cursor.isNull(offset + 3) ? null : cursor.getString(offset + 3) // sign
+            cursor.isNull(offset + 0) ? null : cursor.getLong(offset + 0), // id
+            cursor.isNull(offset + 1) ? null : cursor.getString(offset + 1), // word
+            cursor.isNull(offset + 2) ? null : cursor.getString(offset + 2), // english
+            cursor.isNull(offset + 3) ? null : cursor.getString(offset + 3), // china
+            cursor.isNull(offset + 4) ? null : cursor.getString(offset + 4) // sign
         );
         return entity;
     }
@@ -101,23 +109,28 @@ public class CET4EntityDao extends AbstractDao<CET4Entity, Void> {
     /** @inheritdoc */
     @Override
     public void readEntity(Cursor cursor, CET4Entity entity, int offset) {
-        entity.setWord(cursor.isNull(offset + 0) ? null : cursor.getString(offset + 0));
-        entity.setEnglish(cursor.isNull(offset + 1) ? null : cursor.getString(offset + 1));
-        entity.setChina(cursor.isNull(offset + 2) ? null : cursor.getString(offset + 2));
-        entity.setSign(cursor.isNull(offset + 3) ? null : cursor.getString(offset + 3));
+        entity.setId(cursor.isNull(offset + 0) ? null : cursor.getLong(offset + 0));
+        entity.setWord(cursor.isNull(offset + 1) ? null : cursor.getString(offset + 1));
+        entity.setEnglish(cursor.isNull(offset + 2) ? null : cursor.getString(offset + 2));
+        entity.setChina(cursor.isNull(offset + 3) ? null : cursor.getString(offset + 3));
+        entity.setSign(cursor.isNull(offset + 4) ? null : cursor.getString(offset + 4));
      }
     
     /** @inheritdoc */
     @Override
-    protected Void updateKeyAfterInsert(CET4Entity entity, long rowId) {
-        // Unsupported or missing PK type
-        return null;
+    protected Long updateKeyAfterInsert(CET4Entity entity, long rowId) {
+        entity.setId(rowId);
+        return rowId;
     }
     
     /** @inheritdoc */
     @Override
-    public Void getKey(CET4Entity entity) {
-        return null;
+    public Long getKey(CET4Entity entity) {
+        if(entity != null) {
+            return entity.getId();
+        } else {
+            return null;
+        }
     }
 
     /** @inheritdoc */

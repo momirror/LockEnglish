@@ -159,9 +159,15 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
         timeText.setText(mHours+":"+mMinute);
         dateText.setText(mMonth+"月"+mDay+"日"+" "+"日期"+mWay);
+    }
 
-
-
+    private void saveWrongData() {
+        String word = datas.get(k).getWord();
+        String english = datas.get(k).getEnglish();
+        String china = datas.get(k).getChina();
+        String sign = datas.get(k).getSign();
+        CET4Entity data = new CET4Entity(Long.valueOf(dbDao.count()),word,english,china,sign);
+        dbDao.insertOrReplace(data);
     }
 
     @Override
