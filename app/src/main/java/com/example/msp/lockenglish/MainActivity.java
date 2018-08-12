@@ -161,6 +161,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
         timeText.setText(mHours+":"+mMinute);
         dateText.setText(mMonth+"月"+mDay+"日"+" "+"日期"+mWay);
+
+        BaseApplication.addDestroyActivity(this,"mainActivity");
 //        getDBData(); //这里会因为缺少音频库文件而挂掉
     }
 
