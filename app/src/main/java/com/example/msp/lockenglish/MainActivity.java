@@ -2,18 +2,21 @@ package com.example.msp.lockenglish;
 
 import android.app.KeyguardManager;
 import android.content.Context;
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.database.sqlite.SQLiteDatabase;
 import android.graphics.Color;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.WindowManager;
 import android.widget.ImageView;
 import android.widget.RadioButton;
 import android.widget.RadioGroup;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.example.assetsbasedata.AssetsDatabaseManager;
 import com.example.msp.greendao.entity.greendao.CET4Entity;
@@ -158,6 +161,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
         timeText.setText(mHours+":"+mMinute);
         dateText.setText(mMonth+"月"+mDay+"日"+" "+"日期"+mWay);
+//        getDBData(); //这里会因为缺少音频库文件而挂掉
     }
 
     private void saveWrongData() {
@@ -184,6 +188,22 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     @Override
     public void onCheckedChanged(RadioGroup radioGroup, int i) {
 
+        radioGroup.setClickable(false);
+        switch (i) {
+            case R.id.choose_btn_one:
+                String msg = radioOne.getText().toString().substring(3);
+                Log.d("test",radioOne.getText().toString());
+                btnGetText(msg,radioOne);
+                break;
+            case R.id.choose_btn_two:
+                String msg1 = radioTwo.getText().toString().substring(3);
+                btnGetText(msg1,radioTwo);
+                break;
+            case R.id.choose_btn_three:
+                String msg2 = radioThree.getText().toString().substring(3);
+                btnGetText(msg2,radioThree);
+                break;
+        }
     }
 
     @Override
@@ -246,6 +266,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
     private void btnGetText(String msg,RadioButton btn) {
 
+        Log.d("test","test");
+
         if(msg.equals(datas.get(k).getChina())) {
 
             wordText.setTextColor(Color.GREEN);
@@ -266,4 +288,142 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
         }
     }
+
+    private void setTextColor() {
+        radioOne.setChecked(false);
+        radioTwo.setChecked(false);
+        radioThree.setChecked(false);
+
+        radioOne.setTextColor(Color.parseColor("#FFFFFF"));
+        radioTwo.setTextColor(Color.parseColor("#FFFFFF"));
+        radioThree.setTextColor(Color.parseColor("#FFFFFF"));
+        wordText.setTextColor(Color.parseColor("#FFFFFF"));
+        englishText.setTextColor(Color.parseColor("#FFFFFF"));
+    }
+
+    private void unlock() {
+        Intent intent1 = new Intent(Intent.ACTION_MAIN);
+        intent1.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+        intent1.addCategory(Intent.CATEGORY_HOME);
+        startActivity(intent1);
+        kl.disableKeyguard();
+        finish();
+    }
+
+    /**
+     * 设置选项
+     */
+    private void setChina(List<CET4Entity> datas, int j) {
+        /**
+         * 随机产生几个随机数， 这里面产生几个随机数  是用于解锁单词
+         * 因为此demo输入数据库里面20个单词， 所以产生的随机数是20以内的
+         * */
+        Random r = new Random();
+        List<Integer> listInt = new ArrayList<>();
+        int i;
+        while (listInt.size() < 4) {
+            i = r.nextInt(20);
+            if (!listInt.contains(i)) {
+                listInt.add(i);
+            }
+        }
+        /**
+         * 以下的判断是给这个单词设置三个选项，设置单词选项是有规律的
+         *三个选项，分别是正确的、正确的前一个、正确的的后一个
+         *将这三个解释设置到单词的选项上，以下为实现逻辑
+         * */
+        if (listInt.get(0) < 7) {
+            radioOne.setText("A: " + datas.get(k).getChina());
+            if (k - 1 >= 0) {
+                radioTwo.setText("B: " + datas.get(k - 1).getChina());
+            } else {
+                radioTwo.setText("B: " + datas.get(k + 2).getChina());
+            }
+            if (k + 1 < 20) {
+                radioThree.setText("C: " + datas.get(k + 1).getChina());
+            } else {
+                radioThree.setText("C: " + datas.get(k - 1).getChina());
+            }
+        } else if (listInt.get(0) < 14) {
+            radioTwo.setText("B: " + datas.get(k).getChina());
+            if (k - 1 >= 0) {
+                radioOne.setText("A: " + datas.get(k - 1).getChina());
+            } else {
+                radioOne.setText("A: " + datas.get(k + 2).getChina());
+            }
+            if (k + 1 < 20) {
+                radioThree.setText("C: " + datas.get(k + 1).getChina());
+            } else {
+                radioThree.setText("C: " + datas.get(k - 1).getChina());
+            }
+        } else {
+            radioThree.setText("C: " + datas.get(k).getChina());
+            if (k - 1 >= 0) {
+                radioTwo.setText("B: " + datas.get(k - 1).getChina());
+            } else {
+                radioTwo.setText("B: " + datas.get(k + 2).getChina());
+            }
+            if (k + 1 < 20) {
+                radioOne.setText("A: " + datas.get(k + 1).getChina());
+            } else {
+                radioOne.setText("A: " + datas.get(k - 1).getChina());
+            }
+        }
+
+    }
+
+    private void getDBData() {
+        datas = questionDao.queryBuilder().list();
+        k = list.get(j);
+        wordText.setText(datas.get(k).getWord());
+        englishText.setText(datas.get(k).getEnglish());
+        setChina(datas,k);
+    }
+
+
+    private void getNextData() {
+        j++;
+        int i = sharedPreferences.getInt("allNum",2);
+        if(i > j) {
+            getDBData();
+            setTextColor();
+            int num = sharedPreferences.getInt("alreadyStudy",0)+1;
+            editor.putInt("alreadyStudy",num);
+            editor.commit();
+        } else {
+            unlock();
+        }
+
+    }
+
+
+    @Override
+    public boolean onTouchEvent(MotionEvent event) {
+        if(event.getAction() == MotionEvent.ACTION_DOWN) {
+            x1 = event.getX();
+            y1 = event.getY();
+        }
+
+        if(event.getAction() == MotionEvent.ACTION_UP) {
+            x2 = event.getX();
+            y2 = event.getY();
+
+            if(y1 - y2 > 200) {
+                int num = sharedPreferences.getInt("alreadyMastered",0)+1;
+                editor.putInt("alreadyMastered",num);
+                editor.commit();
+            }
+            Toast.makeText(this,"已掌握",Toast.LENGTH_SHORT).show();
+            getNextData();
+        } else if (y2 - y1 > 200) {
+            Toast.makeText(this,"待加功能",Toast.LENGTH_SHORT).show();
+        } else if (x1 - x2 > 200) {
+            getNextData();
+        } else if(x2 - x1 > 200) {
+            unlock();
+        }
+
+        return  super.onTouchEvent(event);
+    }
+
 }
